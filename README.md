@@ -2,7 +2,7 @@
 ## Installation Steps for Frontend
 1. Clone the repository:
    ```bash
-   git clone https://github.com/hubgitpoonam/FileUpload.git
+   git clone https://github.com/hubgitpoonam/UploadFileProject.git
    cd frontend
 
 2. npm install
@@ -16,7 +16,7 @@
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/hubgitpoonam/FileUpload.git
+   git clone https://github.com/hubgitpoonam/UploadFileProject.git
    cd fileupload
 
 2. python -m virtualenv venv or virtualenv env
