@@ -1,0 +1,26 @@
+# Byte-compiled / optimized Python files
+__pycache__/
+*.py[cod]
+
+# Virtual environment
+venv/
+env/
+.venv/
+
+# IDE files
+.idea/
+.vscode/
+
+# Django-related
+*.log
+db.sqlite3
+media/
+staticfiles/
+.coverage
+.pytest_cache/
+.cache/
+.pytest_cache/
+coverage.xml
+nosetests.xml
+.coverage
+.coverage.*
