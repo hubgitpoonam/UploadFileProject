@@ -24,3 +24,4 @@ coverage.xml
 nosetests.xml
 .coverage
 .coverage.*
+'.env' 
