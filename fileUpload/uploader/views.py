@@ -1,7 +1,7 @@
 from django.shortcuts import render
 
 # Create your views here.
-# uploader/views.py
+
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.parsers import MultiPartParser, FormParser
@@ -24,3 +24,9 @@ class FileUploadView(APIView):
                 return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
         return Response({"message": "Files uploaded successfully"}, status=status.HTTP_201_CREATED)
+    
+
+
+    
+
+
