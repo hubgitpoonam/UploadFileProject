@@ -1,5 +1,5 @@
 from django.http import JsonResponse
-from django.shortcuts import render
+from django.shortcuts import get_object_or_404, render
 from rest_framework.parsers import JSONParser
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework.decorators import api_view
@@ -15,9 +15,15 @@ class FileUploadView(APIView):
 
     def post(self, request, *args, **kwargs):
         files = request.FILES.getlist('file')
+        total_size = sum(file.size for file in files)
+        limit_mb = 20
+
+        if total_size > limit_mb * 1024 * 1024:
+            return Response({"error": f"Total file size exceeds {limit_mb} MB."}, status=status.HTTP_400_BAD_REQUEST)
+        
         for file in files:
-            if file.size > 20 * 1024 * 1024:  # 20MB limit
-                return Response({"error": "File too large"}, status=status.HTTP_400_BAD_REQUEST)
+            if file.size > limit_mb * 1024 * 1024:  # 20MB limit
+                return Response({"error": f"File {file.name} exceeds {limit_mb} MB."}, status=status.HTTP_400_BAD_REQUEST)
 
             serializer = UploadSerializer(data={'file': file})
             if serializer.is_valid():
@@ -28,6 +34,36 @@ class FileUploadView(APIView):
         return Response({"message": "Files uploaded successfully"}, status=status.HTTP_201_CREATED)
     
 
+    def put(self, request, id, *args, **kwargs):
+        try:
+            update_file = Upload.objects.get(id=id)
+        except Upload.DoesNotExist:
+            return Response({"error": "File not found"}, status=status.HTTP_404_NOT_FOUND)
+        
+        # Calculate total size of files being updated
+        files = request.FILES.getlist('file')
+        total_size = sum(file.size for file in files) if files else 0
+        
+        limit_mb = 20
+
+        if total_size > limit_mb * 1024 * 1024:
+            return Response({"error": f"Total file size exceeds {limit_mb} MB."}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Update each file individually
+        for file in files:
+            if file.size > limit_mb * 1024 * 1024:  # 20MB limit
+                return Response({"error": f"File {file.name} exceeds {limit_mb} MB."}, status=status.HTTP_400_BAD_REQUEST)
+
+            file_serializer = UploadSerializer(update_file, data={'file': file})
+            if file_serializer.is_valid():
+                file_serializer.save()
+            else:
+                return Response(file_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+        return Response({
+            "message": "File(s) updated successfully",
+            "data": file_serializer.data
+        }, status=status.HTTP_200_OK)
 
     
 def getFile(request,id=None):
@@ -54,29 +90,6 @@ def getAllFile(request):
     return JsonResponse({"message": "Method not allowed"}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
 
-
-@csrf_exempt
-@api_view(['PUT'])
-def UpdateFile(request, id=None):
-    if request.method == 'PUT':
-        try:
-            update_file = Upload.objects.get(id=id)
-        except Upload.DoesNotExist:
-            return JsonResponse({"message": "File not found"}, status=status.HTTP_404_NOT_FOUND)
-        
-        file_serializer = UploadSerializer(update_file, data=request.data, partial=True)
-        if file_serializer.is_valid():
-            file_serializer.save()
-            return JsonResponse({
-                "message": "File updated successfully",
-                "data": file_serializer.data
-            }, status=status.HTTP_200_OK)
-        return JsonResponse({
-            "message": "Failed to update file",
-            "errors": file_serializer.errors
-        }, status=status.HTTP_400_BAD_REQUEST)
-    
-    return JsonResponse({"message": "Method not allowed"}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
 
 @csrf_exempt
