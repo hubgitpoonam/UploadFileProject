@@ -34,6 +34,8 @@ DEBUG = True
 ALLOWED_HOSTS = []
 
 
+
+
 # Application definition
 
 INSTALLED_APPS = [
@@ -46,6 +48,8 @@ INSTALLED_APPS = [
     'rest_framework',
     'uploader',
     'corsheaders',
+    'rest_framework.authtoken',
+    
 ]
 
 MIDDLEWARE = [
@@ -164,3 +168,15 @@ CORS_ALLOWED_ORIGINS = [
     
     os.getenv('CORS_ORIGIN_WHITELIST')
 ]
+
+
+
+# Configure authentication 
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework.authentication.TokenAuthentication',
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+        
+    ),
+}
+
